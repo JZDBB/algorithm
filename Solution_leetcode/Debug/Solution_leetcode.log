@@ -1,0 +1,4 @@
+﻿  Solution.cpp
+c:\users\yn\source\repos\leetcode_algorithm\solution_leetcode\solution.cpp(12): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\yn\source\repos\leetcode_algorithm\solution_leetcode\solution.cpp(19): warning C4018: “<”: 有符号/无符号不匹配
+LINK : fatal error LNK1561: 必须定义入口点
