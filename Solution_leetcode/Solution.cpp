@@ -1,9 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include<algorithm>
 using namespace std;
 
-#define min(a,b)  (((a)<(b))?(a):(b))
+//#define min(a,b)  (((a)<(b))?(a):(b))
 
 
 
