@@ -5,6 +5,7 @@
 #include<cstdio>
 #include<cmath>
 #include<iomanip>
+
 using namespace std;
 unsigned char *pBmpBuf;//读入图像数据的指针
 
@@ -159,7 +160,7 @@ bool saveBmp(char *bmpName, unsigned char *imgBuf, int width, int height, int bi
 }
 void doIt()
 {
-	char readPath[] = "1.bmp";
+	char readPath[] = "12.bmp";
 	readBmp(readPath);
 	// 输出整体图像信息
 	cout << "width=" << bmpWidth << "height=" << bmpHeight << "biBitCount=" << biBitCount << endl;
@@ -172,18 +173,18 @@ void doIt()
 
 	if (biBitCount == 8)
 	{
-		for (int i = 0; i < bmpHeight / 2; i++)
+		for (int i = 0; i < bmpHeight /2; i++)
 		{
-			for (int j = 0; j < bmpWidth / 2; i++)
+			for (int j = 0; j < bmpWidth /2; j++)
 				*(pBmpBuf + i * linebyte1 + j) = 0;
 		}
 	}
 
 	if (biBitCount == 24)
 	{
-		for (int i = 0; i < bmpHeight; i++)
+		for (int i = 0; i < bmpHeight /2; i++)
 		{
-			for (int j = 0; j < bmpWidth; j++)
+			for (int j = 0; j < bmpWidth /2; j++)
 			{
 				for (int k = 0; k < 3; k++)//每像素RGB三个分量分别置0才变成黑色
 				{
@@ -202,7 +203,7 @@ void doIt()
 	}
 
 	// jiang tuxiang shuju cunpan .
-	char writePath[] = "necpy.BMP";
+	char writePath[] = "3.bmp";
 	saveBmp(writePath, pBmpBuf, bmpWidth, bmpHeight, biBitCount, pColorTable);
 
 	//清除缓冲区，pBmpBuf和pColorTable是全局变量，在文件读入时申请的空间
