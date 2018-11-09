@@ -189,6 +189,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="face_recognition.h" />
     <ClInclude Include="Homework.h" />
     <ClInclude Include="HomeworkDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="face_recognition.cpp" />
     <ClCompile Include="Homework.cpp" />
     <ClCompile Include="HomeworkDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
