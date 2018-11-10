@@ -479,8 +479,6 @@ void SeedFillOld(const cv::Mat& binImg, cv::Mat& lableImg)   //种子填充法
 }
 
 
-
-
 //-------------------------------------------【种子填充法新版】---------------------------
 void SeedFillNew(const cv::Mat& _binImg, cv::Mat& _lableImg)
 {
@@ -503,7 +501,7 @@ void SeedFillNew(const cv::Mat& _binImg, cv::Mat& _lableImg)
 	_binImg.convertTo(_lableImg, CV_32SC1);
 
 	int label = 0; //start by 1
-
+	int num_label = 0;
 	int rows = _binImg.rows;
 	int cols = _binImg.cols;
 
@@ -519,8 +517,8 @@ void SeedFillNew(const cv::Mat& _binImg, cv::Mat& _lableImg)
 			if (data[j] == 255 && mask.at<uchar>(i, j) != 1)
 			{
 				mask.at<uchar>(i, j) = 1;
-				std::stack<std::pair<int, int>> neighborPixels;
-				neighborPixels.push(std::pair<int, int>(i, j)); // pixel position: <i,j>
+				stack<pair<int, int>> neighborPixels;
+				neighborPixels.push(pair<int, int>(i, j)); // pixel position: <i,j>
 				++label; //begin with a new label
 				while (!neighborPixels.empty())
 				{
@@ -576,14 +574,128 @@ void SeedFillNew(const cv::Mat& _binImg, cv::Mat& _lableImg)
 	}
 }
 
+//---------------------------------【自己写的】-----------------------------------
+//找连通域，标注label不同
+void SeekReigns(const Mat& _binImg, Mat& _labelImg)
+{
+	if (_binImg.empty() ||
+		_binImg.type() != CV_8UC1)
+	{
+		return;
+	}
+
+	_labelImg.release();
+	_binImg.convertTo(_labelImg, CV_32SC1);
+
+	int label = 0; //start by 1
+	int num_label = 0;
+	int rows = _binImg.rows;
+	int cols = _binImg.cols;
+
+	for (int i = 0; i < rows; i++)
+	{
+		int* data = _labelImg.ptr<int>(i);
+		for (int j = 0; j < cols; j++)
+		{
+			if (data[j] == 255)
+			{
+				stack<pair<int, int>> neighborPixel;
+				label++;
+				data[j] = label;
+				neighborPixel.push(pair<int, int>(i, j));
+				while (!neighborPixel.empty())
+				{
+					pair<int, int> curPixel = neighborPixel.top();
+					int curY = curPixel.first;
+					int curX = curPixel.second;
+					_labelImg.at<int>(curY, curX) = label;
+
+					neighborPixel.pop();
+
+					if (curX - 1 >= 0)
+					{
+						if (_labelImg.at<int>(curY, curX - 1) == 255 ) //leftpixel
+						{
+							neighborPixel.push(std::pair<int, int>(curY, curX - 1));
+							_labelImg.at<int>(curY, curX) = label;
+
+						}
+						if (curY - 1 >= 0)
+						{
+							if (_labelImg.at<int>(curY - 1, curX - 1) == 255) //leftpixel
+							{
+								neighborPixel.push(std::pair<int, int>(curY - 1, curX - 1));
+								_labelImg.at<int>(curY, curX) = label;
+							}
+						}
+					}
+					if (curX + 1 <= cols - 1)
+					{
+						if (_labelImg.at<int>(curY, curX + 1) == 255)// right pixel
+						{
+							neighborPixel.push(std::pair<int, int>(curY, curX + 1));
+							_labelImg.at<int>(curY, curX) = label;
+						}
+					}
+					if (curY - 1 >= 0)
+					{
+						if (_labelImg.at<int>(curY - 1, curX) == 255)// up pixel
+						{
+							neighborPixel.push(std::pair<int, int>(curY - 1, curX));
+							_labelImg.at<int>(curY, curX) = label;
+						}
+						if (curX + 1 <= rows - 1)
+						{
+							if (_labelImg.at<int>(curY - 1, curX) == 255)// up pixel
+							{
+								neighborPixel.push(std::pair<int, int>(curY - 1, curX + 1));
+								_labelImg.at<int>(curY, curX) = label;
+							}
+						}
+					}
+					if (curY + 1 <= rows - 1)
+					{
+						if (_labelImg.at<int>(curY + 1, curX) == 255)
+						{
+							neighborPixel.push(std::pair<int, int>(curY + 1, curX));
+							_labelImg.at<int>(curY, curX) = label;
+						}
+						if (curX - 1 >= 0)
+						{
+							if (_labelImg.at<int>(curY + 1, curX) == 255)
+							{
+								neighborPixel.push(std::pair<int, int>(curY + 1, curX - 1));
+								_labelImg.at<int>(curY, curX) = label;
+							}
+						}
+						if (curX + 1 <= rows - 1)
+						{
+							if (_labelImg.at<int>(curY + 1, curX) == 255)
+							{
+								neighborPixel.push(std::pair<int, int>(curY + 1, curX + 1));
+								_labelImg.at<int>(curY, curX) = label;
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
+
 
 //---------------------------------【颜色标记程序】-----------------------------------
 //彩色显示
-cv::Scalar GetColor()
+cv::Scalar GetColor(int value)
 {
-	uchar r = 255 / 4;
-	uchar g = 255 / 3;
-	uchar b = 255 / 2;
+	uchar r, g, b;
+
+	uchar color_arr[20][3] = { {0, 0, 255}, {0, 255, 0}, {255, 0, 0}, {255,20,147}, {148,0,211}, {0,255,127}, {218,165,32}, {255,140,0}, {128,128,0}, {25,25,112} };
+
+	r = color_arr[value][0];
+	g = color_arr[value][1];
+	b = color_arr[value][2];
 	return cv::Scalar(b, g, r);
 }
 
@@ -606,6 +718,20 @@ void LabelColor(const cv::Mat& labelImg, cv::Mat& colorLabelImg)
 	colorLabelImg.create(rows, cols, CV_8UC3);
 	colorLabelImg = cv::Scalar::all(0);
 
+	int label = 0;
+
+	for (int i = 0; i < rows; i++)
+	{
+		const int* data_src = (int*)labelImg.ptr<int>(i);
+		for (int j = 0; j < cols; j++)
+		{
+			if (data_src[j] > label)
+			{
+				label = data_src[j];
+			}
+		}
+	}
+
 	for (int i = 0; i < rows; i++)
 	{
 		const int* data_src = (int*)labelImg.ptr<int>(i);
@@ -613,15 +739,9 @@ void LabelColor(const cv::Mat& labelImg, cv::Mat& colorLabelImg)
 		for (int j = 0; j < cols; j++)
 		{
 			int pixelValue = data_src[j];
-			if (pixelValue > 1)
+			if (pixelValue >= 1)
 			{
-				if (colors.count(pixelValue) <= 0)
-				{
-					colors[pixelValue] = GetColor();
-					num++;
-				}
-
-				cv::Scalar color = colors[pixelValue];
+				Scalar color = GetColor(pixelValue / 10);
 				*data_dst++ = color[0];
 				*data_dst++ = color[1];
 				*data_dst++ = color[2];
@@ -634,7 +754,7 @@ void LabelColor(const cv::Mat& labelImg, cv::Mat& colorLabelImg)
 			}
 		}
 	}
-	printf("color num : %d \n", num);
+
 }
 
 //------------------------------------------【测试主程序】-------------------------------------
@@ -642,7 +762,7 @@ int main()
 {
 
 	Mat binImage;
-	binImage = imread("1.bmp", IMREAD_COLOR);
+	binImage = imread("2.bmp", IMREAD_COLOR);
 	cvtColor(binImage, binImage, COLOR_RGB2GRAY);
 	Mat labelImg;
 	
@@ -650,11 +770,14 @@ int main()
 	//Two_PassOld(binImage, labelImg);
 	//Two_PassNew(binImage, labelImg);
 	//SeedFillOld(binImage, labelImg);
-	SeedFillNew(binImage, labelImg);
+	//SeedFillNew(binImage, labelImg);
+	SeekReigns(binImage, labelImg);
 	
 	//彩色显示
 	Mat colorLabelImg;
 	LabelColor(labelImg, colorLabelImg);
 	imshow("colorImg", colorLabelImg);
 	waitKey(0);
+
+	imwrite("11.bmp", colorLabelImg);
 }
