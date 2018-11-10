@@ -115,7 +115,6 @@ std::vector<std::pair<cv::Mat, std::string >> get_CropFace_And_ImgPathName(const
 
 bool matchFace(cv::Mat detectFace, cv::Mat dbFace)
 {
-	
 	int hbins = 30, sbins = 32;
 	int histSize[] = { hbins, sbins };
 	// hue varies from 0 to 179, see cvtColor
@@ -125,19 +124,16 @@ bool matchFace(cv::Mat detectFace, cv::Mat dbFace)
 	float sranges[] = { 0, 256 };
 	const float* ranges[] = { hranges, sranges };
 	MatND Histogram1, Histogram2;
-	int channels[] = { 0, 1 };
+	int channels[1] = {0};
 	/*CvHistogram *Histogram1 = CreateHist(1, &histogramBins, CV_HIST_ARRAY, histogramRange);
 	CvHistogram *Histogram2 = CreateHist(1, &histogramBins, CV_HIST_ARRAY, histogramRange);*/
-	
-	imshow("", detectFace);
-	//imshow("", dbFace);
 
-	calcHist(&detectFace, 1, channels, Mat(), Histogram1, 2, histSize, ranges, true, false);
-	calcHist(&dbFace, 1, channels, Mat(), Histogram2, 2, histSize, ranges, true, false);
+	calcHist(&detectFace, 1, channels, Mat(), Histogram1, 1, histSize, ranges);
+	calcHist(&dbFace, 1, channels, Mat(), Histogram2, 1, histSize, ranges);
 
-	/*double factor = 1;
-	cvNormalizeHist(Histogram1, factor);
-	NormalizeHist(Histogram2, factor);*/
+
+	normalize(Histogram1, Histogram1, 0, 1, NORM_MINMAX, -1, Mat());
+	normalize(Histogram2, Histogram2, 0, 1, NORM_MINMAX, -1, Mat());
 
 
 	// CV_COMP_CHISQR,CV_COMP_BHATTACHARYYA这两种都可以用来做直方图的比较，值越小，说明图形越相似  
@@ -148,14 +144,14 @@ bool matchFace(cv::Mat detectFace, cv::Mat dbFace)
 	// CV_COMP_CORREL, CV_COMP_INTERSECT这两种直方图的比较，值越大，说明图形越相似  
 	//printf("CV_COMP_CORREL : %.4f\n", cvCompareHist(Histogram1, Histogram2, CV_COMP_CORREL));  
 	//printf("CV_COMP_INTERSECT : %.4f\n", cvCompareHist(Histogram1, Histogram2, CV_COMP_INTERSECT));
-	double simility = compareHist(Histogram1, Histogram2, CV_COMP_CHISQR);
+	double simility = compareHist(Histogram1, Histogram2, CV_COMP_CORREL);
 
-	if (simility > 0.5)
+	if (simility > 0.55)
 	{
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 //void face_recognition(std::string recognitionPath, const std::string cascadeName)
