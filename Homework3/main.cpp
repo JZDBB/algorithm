@@ -687,15 +687,12 @@ void SeekReigns(const Mat& _binImg, Mat& _labelImg)
 
 //---------------------------------【颜色标记程序】-----------------------------------
 //彩色显示
-cv::Scalar GetColor(int value)
+cv::Scalar GetColor()
 {
-	uchar r, g, b;
+	uchar r = 255 * (rand() / (1.0 + RAND_MAX));
+	uchar g = 255 * (rand() / (1.0 + RAND_MAX));
+	uchar b = 255 * (rand() / (1.0 + RAND_MAX));
 
-	uchar color_arr[20][3] = { {0, 0, 255}, {0, 255, 0}, {255, 0, 0}, {255,20,147}, {148,0,211}, {0,255,127}, {218,165,32}, {255,140,0}, {128,128,0}, {25,25,112} };
-
-	r = color_arr[value][0];
-	g = color_arr[value][1];
-	b = color_arr[value][2];
 	return cv::Scalar(b, g, r);
 }
 
@@ -741,7 +738,17 @@ void LabelColor(const cv::Mat& labelImg, cv::Mat& colorLabelImg)
 			int pixelValue = data_src[j];
 			if (pixelValue >= 1)
 			{
-				Scalar color = GetColor(pixelValue / 10);
+				/*Scalar color = GetColor();
+				*data_dst++ = color[0];
+				*data_dst++ = color[1];
+				*data_dst++ = color[2];*/
+
+				if (colors.count(pixelValue) <= 0)
+				{
+					colors[pixelValue] = GetColor();
+				}
+
+				cv::Scalar color = colors[pixelValue];
 				*data_dst++ = color[0];
 				*data_dst++ = color[1];
 				*data_dst++ = color[2];
@@ -762,7 +769,7 @@ int main()
 {
 
 	Mat binImage;
-	binImage = imread("2.bmp", IMREAD_COLOR);
+	binImage = imread("1.bmp", IMREAD_COLOR);
 	cvtColor(binImage, binImage, COLOR_RGB2GRAY);
 	Mat labelImg;
 	
