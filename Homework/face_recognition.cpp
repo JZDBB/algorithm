@@ -1,5 +1,5 @@
 #include "face_recognition.h"
-
+#include "stdafx.h"
 #include <opencv2\opencv.hpp>
 #include <opencv2\core\core.hpp>
 //#include <opencv2\highgui\highgui.hpp>
@@ -126,10 +126,12 @@ bool matchFace(cv::Mat detectFace, cv::Mat dbFace)
 	const float* ranges[] = { hranges, sranges };
 	MatND Histogram1, Histogram2;
 	int channels[] = { 0, 1 };
-	int histSize[] = { 30, 32 };
 	/*CvHistogram *Histogram1 = CreateHist(1, &histogramBins, CV_HIST_ARRAY, histogramRange);
 	CvHistogram *Histogram2 = CreateHist(1, &histogramBins, CV_HIST_ARRAY, histogramRange);*/
 	
+	imshow("", detectFace);
+	//imshow("", dbFace);
+
 	calcHist(&detectFace, 1, channels, Mat(), Histogram1, 2, histSize, ranges, true, false);
 	calcHist(&dbFace, 1, channels, Mat(), Histogram2, 2, histSize, ranges, true, false);
 
