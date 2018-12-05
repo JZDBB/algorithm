@@ -27,6 +27,8 @@ class Solution {
 		}
 	
 	}
+	
+	
 	/*给出一个长度为n + 1的数组，其中每个数字的范围是[1, n]，其中只有一个重复的数，
 	  现在要求找出这个重复的数，并且满足以下条件：
 		不能改动原始数组
@@ -51,6 +53,8 @@ class Solution {
 		}
 		    return l;	
 	}
+
+
 	/*
 	有一个正整数n，找到一系列的完全平方数（比如，1,4,9,16,...），
 	它们的和为n，并且这些完全平方数的数量最少，返回完全平方数的最少数量。
@@ -76,6 +80,7 @@ class Solution {
 		    return cntPerfectSquares[n];
 		
 	}
+
 
 	// 将数字转变为英文写法。
 	string get(int num)
@@ -125,6 +130,8 @@ class Solution {
 		}
 		return ans;
 	}
+
+
 
 };
 
